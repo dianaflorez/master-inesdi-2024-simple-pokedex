@@ -32,6 +32,49 @@ export function Pokedex() {
     setI((i) => i + 1);
   };
 
+  const getTypeIcon = (type: string): string => {
+    switch (type) {
+      case 'grass':
+          return '🌿';
+      case 'fire':
+          return '🔥';
+      case 'water':
+          return '💧';
+      case 'poison':
+          return '💀';
+      case 'normal': 
+          return '🐾';
+      case 'electric': 
+          return '⚡️';
+      case 'bug':
+          return '🐞';
+      case 'ice': 
+          return '❄️';
+      case 'fighting': 
+          return '👊';
+      case 'ground': 
+          return '🏜️';
+      case 'flying': 
+          return '🕊️';
+      case 'psychic': 
+          return '🔮';
+      case 'rock': 
+          return '🐾';
+      case 'ghost': 
+          return '👻';
+      case 'dragon': 
+          return '🐉';
+      case 'dark': 
+          return '🌑';
+      case 'steel': 
+          return '🛡️';
+      case 'fairy': 
+          return '🧚';
+      default:
+          return '🐾';
+    }
+  };
+
   return (
     <div className={c("pokedex", `pokedex-${theme}`)}>
       <div className="panel left-panel">
@@ -61,7 +104,22 @@ export function Pokedex() {
             {selectedPokemon?.name}
           </div>
         </div>
+
+        <div className="screen name-display">
+          <p>Types:</p>
+          <div>
+            {selectedPokemon?.types.map((typeData, index) => (
+              <span key={index}>
+                {typeData.type.name.toLowerCase()}
+                {getTypeIcon(typeData.type.name.toLowerCase())}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        
       </div>
+
       <div className="panel right-panel">
         <div className="controls leds">
           <LedDisplay color="blue" />
