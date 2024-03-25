@@ -1,12 +1,19 @@
 import c from "classnames";
 import { useTheme } from "contexts/use-theme";
-import { usePokemon, usePokemonList, useTextTransition } from "hooks";
+import { usePokemon, usePokemonList, useTextTransition, usePokemonWeaknesses } from "hooks";
 import { useState } from "react";
 import { randomMode } from "utils/random";
 import { Button } from "./button";
 import { LedDisplay } from "./led-display";
 
 import "./pokedex.css";
+
+interface Pokemon {
+  id: number;
+  name: string;
+  sprites: string;
+}
+
 
 export function Pokedex() {
   const { theme } = useTheme();
@@ -15,6 +22,8 @@ export function Pokedex() {
   const [i, setI] = useState(0);
   const { pokemon: selectedPokemon } = usePokemon(pokemonList[i]);
   const { pokemon: nextPokemon } = usePokemon(pokemonList[i + 1]);
+  console.log(pokemonList[i])
+  const weaknesses  = usePokemonWeaknesses(pokemonList[i]?.name);
 
   const prev = () => {
     resetTransition();
@@ -75,23 +84,56 @@ export function Pokedex() {
     }
   };
 
+  const [pokeballs, setPokeballs] = useState<Array<Pokemon | null>>(Array(6).fill(null));
+
+  const handlePokemonSelect = (pokemon: Pokemon) => {
+    const pokeballIndex = pokeballs.findIndex(ball => ball === null);
+    if (pokeballIndex !== -1) {
+      const updatedPokeballs = [...pokeballs];
+      updatedPokeballs[pokeballIndex] = pokemon;
+      setPokeballs(updatedPokeballs);
+    }
+  };
+  
   return (
     <div className={c("pokedex", `pokedex-${theme}`)}>
       <div className="panel left-panel">
-        <div className="screen main-screen">
-          {selectedPokemon && (
-            <img
-              className={c(
-                "sprite",
-                "obfuscated",
-                ready && "ready",
-                ready && `ready--${randomMode()}`
+        
+        <div className="pokedex-mini">
+          <div className="panel-img left-panel-img">
+            <div className="screen main-screen">
+              {selectedPokemon && (
+                <img
+                  className={c(
+                    "sprite",
+                    "obfuscated",
+                    ready && "ready",
+                    ready && `ready--${randomMode()}`
+                  )}
+                  src={selectedPokemon.sprites.front_default}
+                  alt={selectedPokemon.name}
+                  onClick={() => handlePokemonSelect(selectedPokemon)}
+                />
               )}
-              src={selectedPokemon.sprites.front_default}
-              alt={selectedPokemon.name}
-            />
-          )}
+            </div>
+            *** Click en la imagen para seleccionarla
+          </div>
+
+          <div className="panel-weakness right-panel">
+            <div className="screen-wek name-display-wek">
+              <div>
+                <strong>Weaknesses:</strong>
+                {weaknesses?.map((weakness, index) => (
+                  <div key={index}>
+                    {getTypeIcon(weakness.toLowerCase())}
+                    {weakness}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
+
         <div className="screen name-display">
           <div
             className={c(
@@ -111,13 +153,12 @@ export function Pokedex() {
             {selectedPokemon?.types.map((typeData, index) => (
               <span key={index}>
                 {typeData.type.name.toLowerCase()}
-                {getTypeIcon(typeData.type.name.toLowerCase())}
+                {getTypeIcon(typeData.type.name.toLowerCase())},
               </span>
             ))}
           </div>
         </div>
 
-        
       </div>
 
       <div className="panel right-panel">
@@ -126,6 +167,21 @@ export function Pokedex() {
           <LedDisplay color="red" />
           <LedDisplay color="yellow" />
         </div>
+
+        
+        <div className="pokeballs-container">
+          {pokeballs.map((pokemon, index) => (
+            <div key={index} style={{ display: 'inline-block', margin: '0px' }}>
+              {pokemon ? (
+                <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+              ) : (
+                <img src="https://purepng.com/public/uploads/large/purepng.com-pokeballpokeballdevicepokemon-ballpokemon-capture-ball-1701527825716o2adc.png" alt="Pokeball" />
+              )}
+            </div>
+          ))}
+        </div>
+
+
         <div className="screen second-screen">
           {nextPokemon && (
             <img
