@@ -11,7 +11,9 @@ import "./pokedex.css";
 interface Pokemon {
   id: number;
   name: string;
-  sprites: string;
+  sprites: {
+    front_default: string;
+  };
 }
 
 
